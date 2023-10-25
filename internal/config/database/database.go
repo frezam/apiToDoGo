@@ -42,3 +42,37 @@ func InitDb() *sql.DB {
 func CloseDb(db *sql.DB) {
 	defer db.Close()
 }
+
+func CreateTables(db *sql.DB) {
+	createUserTable := `
+		CREATE TABLE IF NOT EXISTS tdlist.users (
+			id SERIAL PRIMARY KEY,
+			name VARCHAR(255) NOT NULL,
+			email VARCHAR(255) NOT NULL,
+			password VARCHAR(255) NOT NULL 
+		);
+	`
+
+	createTaskTable := `
+		CREATE TABLE IF NOT EXISTS tdlist.tasks (
+			id SERIAL PRIMARY KEY,
+			title VARCHAR(255) NOT NULL,
+			description VARCHAR(255) NOT NULL,
+			user_id INTEGER REFERENCES tdlist.users(id)
+		);
+	`
+
+	_, err := db.Exec(createUserTable)
+
+	if err != nil {
+		fmt.Println("Error creating user table", err.Error())
+		panic(err)
+	}
+
+	_, err = db.Exec(createTaskTable)
+
+	if err != nil {
+		fmt.Println("Error creating task table", err.Error())
+		panic(err)
+	}
+}

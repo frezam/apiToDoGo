@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
-
+	"github.com/GbSouza15/apiToDoGo/internal/app/routers"
 	"github.com/GbSouza15/apiToDoGo/internal/config/database"
 	"github.com/GbSouza15/apiToDoGo/internal/config/database/schema"
-
-	"net/http"
 )
 
 func main() {
@@ -14,11 +11,9 @@ func main() {
 
 	schema.CreateSchemaAndTable(db)
 
+	database.CreateTables(db)
+
+	routers.RoutesApi(db)
+
 	database.CloseDb(db)
-
-	fmt.Println("Server is running on port 8080")
-
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		panic(err)
-	}
 }
