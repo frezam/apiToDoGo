@@ -7,12 +7,15 @@ import (
 	"net/http"
 
 	"github.com/GbSouza15/apiToDoGo/internal/app/models"
+	"github.com/google/uuid"
 )
 
 func (h handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
+	var newUser models.User
+	userId := uuid.NewString()
 
-	fmt.Println(string(body))
+	fmt.Println(userId)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -21,8 +24,6 @@ func (h handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var newUser models.User
-
 	if err := json.Unmarshal(body, &newUser); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Erro ao descodificar json"))
@@ -30,7 +31,7 @@ func (h handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.DB.Exec("INSERT INTO tdlist.users (name, email, password) VALUES ($1, $2, $3)", newUser.Name, newUser.Email, newUser.Password)
+	_, err = h.DB.Exec("INSERT INTO tdlist.users (id, name, email, password) VALUES ($1, $2, $3, $4)", userId, newUser.Name, newUser.Email, newUser.Password)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

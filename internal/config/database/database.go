@@ -46,7 +46,7 @@ func CloseDb(db *sql.DB) {
 func CreateTables(db *sql.DB) {
 	createUserTable := `
 		CREATE TABLE IF NOT EXISTS tdlist.users (
-			id SERIAL PRIMARY KEY,
+			id UUID PRIMARY KEY,
 			name VARCHAR(255) NOT NULL,
 			email VARCHAR(255) NOT NULL,
 			password VARCHAR(255) NOT NULL 
@@ -58,7 +58,7 @@ func CreateTables(db *sql.DB) {
 			id SERIAL PRIMARY KEY,
 			title VARCHAR(255) NOT NULL,
 			description VARCHAR(255) NOT NULL,
-			user_id INTEGER REFERENCES tdlist.users(id)
+			user_id UUID REFERENCES tdlist.users(id)
 		);
 	`
 
