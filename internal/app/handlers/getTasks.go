@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	_ "fmt"
 	"net/http"
 
 	"github.com/GbSouza15/apiToDoGo/internal/app/models"

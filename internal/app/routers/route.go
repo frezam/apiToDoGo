@@ -15,10 +15,11 @@ func RoutesApi(db *sql.DB) {
 	h := handlers.New(db)
 
 	r.HandleFunc("/{userId}/tasks", h.GetTasksHandler).Methods("GET")
-
-	fmt.Println("Server is running on port 8080")
+	r.HandleFunc("/register", h.RegisterUserHandler).Methods("POST")
 
 	http.Handle("/", r)
+
+	fmt.Println("Server is running on port 8080")
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
