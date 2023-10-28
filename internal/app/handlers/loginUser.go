@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,10 +11,8 @@ import (
 )
 
 func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Login user")
-
 	var userLogin models.UserLogin
-	//var user models.User
+	var user models.User
 
 	body, err := io.ReadAll(r.Body)
 
@@ -28,13 +27,27 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Lógica para o login
-
-	fmt.Println(userLogin)
+	err = h.DB.QueryRow("SELECT * FROM tdlist.users WHERE email = $1", userLogin.Email).Scan(&user.ID, &user.Email, &user.Name, &user.Password)
 
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("Nenhum registro desse usuário"))
+		if err == sql.ErrNoRows {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("Nenhum registro desse usuário"))
+			return
+		} else {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("Erro no servidor"))
+			return
+		}
+	}
+
+	responseJSON, err := json.Marshal(user)
+
+	if err != nil {
+		w.Write([]byte("Erro ao codificar o JSON"))
 		return
 	}
+
+	fmt.Println(user)
+	w.Write(responseJSON)
 }
