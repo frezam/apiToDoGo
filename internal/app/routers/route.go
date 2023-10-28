@@ -16,6 +16,7 @@ func RoutesApi(db *sql.DB) {
 
 	r.HandleFunc("/{userId}/tasks", h.GetTasksHandler).Methods("GET")
 	r.HandleFunc("/register", h.RegisterUserHandler).Methods("POST")
+	r.HandleFunc("/login", h.LoginUserHandler).Methods("POST")
 
 	http.Handle("/", r)
 
