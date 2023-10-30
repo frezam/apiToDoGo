@@ -13,7 +13,6 @@ import (
 
 func (h handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Erro ao ler o corpo da requisição"))
@@ -32,13 +31,11 @@ func (h handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bytes, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), 14)
-
 	if err != nil {
 		fmt.Println("Error in Hash.")
 	}
 
 	_, err = h.DB.Exec("INSERT INTO tdlist.users (id, name, email, password) VALUES ($1, $2, $3, $4)", userId, newUser.Name, newUser.Email, bytes)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Erro ao registrar usuário."))

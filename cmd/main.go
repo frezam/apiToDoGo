@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/GbSouza15/apiToDoGo/internal/app/routers"
-	"github.com/GbSouza15/apiToDoGo/internal/config/database"
-	"github.com/GbSouza15/apiToDoGo/internal/config/database/schema"
+	"github.com/GbSouza15/apiToDoGo/internal/database"
+	"github.com/GbSouza15/apiToDoGo/internal/database/schema"
 )
 
 func main() {

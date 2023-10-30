@@ -11,11 +11,9 @@ import (
 
 func (h handler) GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-
 	userId := vars["userId"]
 
 	res, err := h.DB.Query("SELECT * FROM tdlist.tasks WHERE user_id = $1", userId)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Erro ao buscar tarefas"))
@@ -33,18 +31,17 @@ func (h handler) GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Error scanning articles: ", err.Error())
 			return
 		}
-
 		tasks = append(tasks, task)
 	}
 
 	responseJSON, err := json.Marshal(tasks)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Erro ao converter para JSON"))
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(responseJSON)
 }

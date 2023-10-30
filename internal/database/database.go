@@ -11,11 +11,8 @@ import (
 )
 
 func InitDb() *sql.DB {
-
 	var err error
-
 	godotenv.Load()
-
 	var (
 		user    = os.Getenv("USER")
 		pass    = os.Getenv("PASS")
@@ -28,19 +25,18 @@ func InitDb() *sql.DB {
 	connectString := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=%s", user, dbname, pass, host, port, sslmode)
 
 	db, err := sql.Open("postgres", connectString)
-
 	if err != nil {
 		fmt.Println("Error opening database connection", err.Error())
 		panic(err)
 	}
 
 	fmt.Println("Database connected!")
-
 	return db
 }
 
 func CloseDb(db *sql.DB) {
 	defer db.Close()
+	fmt.Println("Close DB")
 }
 
 func CreateTables(db *sql.DB) {
@@ -63,14 +59,12 @@ func CreateTables(db *sql.DB) {
 	`
 
 	_, err := db.Exec(createUserTable)
-
 	if err != nil {
 		fmt.Println("Error creating user table", err.Error())
 		panic(err)
 	}
 
 	_, err = db.Exec(createTaskTable)
-
 	if err != nil {
 		fmt.Println("Error creating task table", err.Error())
 		panic(err)

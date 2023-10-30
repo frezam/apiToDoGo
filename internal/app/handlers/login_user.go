@@ -14,9 +14,7 @@ import (
 func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	var userLogin models.UserLogin
 	var user models.User
-
 	body, err := io.ReadAll(r.Body)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Erro ao fazer login."))
@@ -29,17 +27,15 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = h.DB.QueryRow("SELECT * FROM tdlist.users WHERE email = $1", userLogin.Email).Scan(&user.ID, &user.Email, &user.Name, &user.Password)
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("Nenhum registro desse usuário"))
 			return
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Erro no servidor"))
-			return
 		}
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Erro no servidor"))
+		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userLogin.Password)); err != nil {
@@ -49,12 +45,12 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseJSON, err := json.Marshal(user)
-
 	if err != nil {
 		w.Write([]byte("Erro ao codificar o JSON"))
 		return
 	}
 
 	fmt.Println(user)
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseJSON)
 }

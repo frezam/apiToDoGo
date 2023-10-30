@@ -11,17 +11,14 @@ import (
 
 func RoutesApi(db *sql.DB) {
 	r := mux.NewRouter()
-
 	h := handlers.New(db)
 
-	r.HandleFunc("/{userId}/tasks", h.GetTasksHandler).Methods("GET")
-	r.HandleFunc("/register", h.RegisterUserHandler).Methods("POST")
-	r.HandleFunc("/login", h.LoginUserHandler).Methods("POST")
+	r.HandleFunc("/{userId}/tasks", h.GetTasksHandler).Methods(http.MethodGet)
+	r.HandleFunc("/register", h.RegisterUserHandler).Methods(http.MethodPost)
+	r.HandleFunc("/login", h.LoginUserHandler).Methods(http.MethodPost)
 
 	http.Handle("/", r)
-
 	fmt.Println("Server is running on port 8080")
-
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
 	}
