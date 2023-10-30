@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/GbSouza15/apiToDoGo/internal/app/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +40,12 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Erro no servidor"))
 			return
 		}
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userLogin.Password)); err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Senha Incorreta"))
+		return
 	}
 
 	responseJSON, err := json.Marshal(user)
