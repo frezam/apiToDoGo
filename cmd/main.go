@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/GbSouza15/apiToDoGo/internal/app/routers"
 	"github.com/GbSouza15/apiToDoGo/internal/database"
 	"github.com/GbSouza15/apiToDoGo/internal/database/schema"
@@ -13,7 +15,11 @@ func main() {
 
 	database.CreateTables(db)
 
-	routers.RoutesApi(db)
+	err := routers.RoutesApi(db)
+
+	if err != nil {
+		fmt.Printf("Erro ao iniciar o servidor: %v", err)
+	}
 
 	database.CloseDb(db)
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func RoutesApi(db *sql.DB) {
+func RoutesApi(db *sql.DB) error {
 	r := mux.NewRouter()
 	h := handlers.New(db)
 
@@ -22,4 +22,5 @@ func RoutesApi(db *sql.DB) {
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
 	}
+	return nil
 }
