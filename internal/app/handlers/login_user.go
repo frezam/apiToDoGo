@@ -16,41 +16,35 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Erro ao fazer login."))
+		SendResponse(500, []byte("Erro ao fazer o login"), w)
 	}
 
 	if err := json.Unmarshal(body, &userLogin); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Erro na decodificação do json"))
+		SendResponse(500, []byte("Erro na decodificação do json"), w)
 		return
 	}
 
-	err = h.DB.QueryRow("SELECT * FROM tdlist.users WHERE email = $1", userLogin.Email).Scan(&user.ID, &user.Email, &user.Name, &user.Password)
+	err = h.DB.QueryRow("SELECT * FROM tdlist.users WHERE email = $1", userLogin.Email).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte("Nenhum registro desse usuário"))
+			SendResponse(404, []byte("Nenhum registro desse usuário"), w)
 			return
 		}
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("Erro no servidor"))
+		SendResponse(401, []byte("Erro no servidor"), w)
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userLogin.Password)); err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("Senha Incorreta"))
+		SendResponse(401, []byte("Senha incorreta"), w)
 		return
 	}
 
 	responseJSON, err := json.Marshal(user)
 	if err != nil {
-		w.Write([]byte("Erro ao codificar o JSON"))
+		SendResponse(500, []byte("Erro ao codificar o JSON"), w)
 		return
 	}
 
 	fmt.Println(user)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(responseJSON)
+	SendResponse(200, responseJSON, w)
 }

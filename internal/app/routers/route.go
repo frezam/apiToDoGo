@@ -10,6 +10,7 @@ import (
 )
 
 func RoutesApi(db *sql.DB) error {
+
 	r := mux.NewRouter()
 	h := handlers.New(db)
 
@@ -20,7 +21,7 @@ func RoutesApi(db *sql.DB) error {
 	http.Handle("/", r)
 	fmt.Println("Server is running on port 8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
-		panic(err)
+		return err
 	}
 	return nil
 }

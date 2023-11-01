@@ -15,8 +15,7 @@ func (h handler) GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.DB.Query("SELECT * FROM tdlist.tasks WHERE user_id = $1", userId)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Erro ao buscar tarefas"))
+		SendResponse(500, []byte("Erro ao buscar tarefas"), w)
 		return
 	}
 
@@ -26,8 +25,7 @@ func (h handler) GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 		var task models.Task
 
 		if err := res.Scan(&task.ID, &task.Title, &task.Description, &task.UserID); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Error in articles"))
+			SendResponse(500, []byte("Error in articles"), w)
 			fmt.Println("Error scanning articles: ", err.Error())
 			return
 		}
@@ -36,12 +34,9 @@ func (h handler) GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 
 	responseJSON, err := json.Marshal(tasks)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Erro ao converter para JSON"))
+		SendResponse(500, []byte("Erro ao converter para JSON"), w)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(responseJSON)
+	SendResponse(200, responseJSON, w)
 }

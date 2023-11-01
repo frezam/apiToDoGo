@@ -14,8 +14,7 @@ import (
 func (h handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Erro ao ler o corpo da requisição"))
+		SendResponse(500, []byte("Erro ao ler o corpo da requisição"), w)
 		fmt.Println(err.Error())
 		return
 	}
@@ -24,8 +23,7 @@ func (h handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	userId := uuid.NewString()
 
 	if err := json.Unmarshal(body, &newUser); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Erro ao descodificar json"))
+		SendResponse(500, []byte("Erro ao descodificar json"), w)
 		fmt.Println(err.Error())
 		return
 	}
@@ -37,12 +35,9 @@ func (h handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err = h.DB.Exec("INSERT INTO tdlist.users (id, name, email, password) VALUES ($1, $2, $3, $4)", userId, newUser.Name, newUser.Email, bytes)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Erro ao registrar usuário."))
+		SendResponse(500, []byte("Erro ao registrar usuário."), w)
 		fmt.Println(err.Error())
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Usuário registrado com sucesso."))
+	SendResponse(200, []byte("Usuário registrado com sucesso."), w)
 }
