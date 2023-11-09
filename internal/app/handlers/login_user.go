@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/GbSouza15/apiToDoGo/internal/app/models"
+	"github.com/GbSouza15/apiToDoGo/internal/authenticator"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -60,6 +61,13 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tokenValidReturn, err := authenticator.ValidatorToken(tokenString)
+	if err != nil {
+		SendResponse(500, []byte("Erro ao validar o token"), w)
+		return
+	}
+
+	fmt.Println(tokenValidReturn)
 	fmt.Println(user)
 	SendResponse(200, responseJSON, w)
 }
