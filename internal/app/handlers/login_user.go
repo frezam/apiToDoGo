@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/GbSouza15/apiToDoGo/internal/app/models"
@@ -42,12 +43,12 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// make changes to the api response
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
+	secret := os.Getenv("SECRET")
 	claims["user_id"] = user.ID
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
-	tokenString, err := token.SignedString([]byte("secret"))
+	tokenString, err := token.SignedString([]byte(secret))
 	if err != nil {
 		SendResponse(500, []byte("Erro ao gerar o token"), w)
 		return
