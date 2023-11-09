@@ -39,5 +39,6 @@ func (h handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err.Error())
 		return
 	}
+
 	SendResponse(200, []byte("Usuário registrado com sucesso."), w)
 }

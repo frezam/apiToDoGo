@@ -6,14 +6,17 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/GbSouza15/apiToDoGo/internal/app/models"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	var userLogin models.UserLogin
 	var user models.User
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		SendResponse(500, []byte("Erro ao fazer o login"), w)
@@ -39,7 +42,18 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseJSON, err := json.Marshal(user)
+	// make changes to the api response
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["user_id"] = user.ID
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	tokenString, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		SendResponse(500, []byte("Erro ao gerar o token"), w)
+		return
+	}
+	response := map[string]string{"token": tokenString}
+	responseJSON, err := json.Marshal(response)
 	if err != nil {
 		SendResponse(500, []byte("Erro ao codificar o JSON"), w)
 		return

@@ -10,8 +10,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func InitDb() *sql.DB {
-	var err error
+func InitDb() (*sql.DB, error) {
 	godotenv.Load()
 	var (
 		user    = os.Getenv("USER")
@@ -26,20 +25,14 @@ func InitDb() *sql.DB {
 
 	db, err := sql.Open("postgres", connectString)
 	if err != nil {
-		fmt.Println("Error opening database connection", err.Error())
-		panic(err)
+		return nil, err
 	}
 
 	fmt.Println("Database connected!")
-	return db
+	return db, nil
 }
 
-func CloseDb(db *sql.DB) {
-	defer db.Close()
-	fmt.Println("Close DB")
-}
-
-func CreateTables(db *sql.DB) {
+func CreateTables(db *sql.DB) error {
 	createUserTable := `
 		CREATE TABLE IF NOT EXISTS tdlist.users (
 			id UUID PRIMARY KEY,
@@ -60,13 +53,13 @@ func CreateTables(db *sql.DB) {
 
 	_, err := db.Exec(createUserTable)
 	if err != nil {
-		fmt.Println("Error creating user table", err.Error())
-		panic(err)
+		return fmt.Errorf("erro ao criar tabela User: %s", err.Error())
 	}
 
 	_, err = db.Exec(createTaskTable)
 	if err != nil {
-		fmt.Println("Error creating task table", err.Error())
-		panic(err)
+		return fmt.Errorf("erro ao criar tabela Task: %s", err.Error())
 	}
+
+	return nil
 }

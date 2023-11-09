@@ -9,11 +9,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (h handler) GetTasksHandler(w http.ResponseWriter, r *http.Request) {
+func (h handler) GetTasksForUserHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["userId"]
 
-	res, err := h.DB.Query("SELECT * FROM tdlist.tasks WHERE user_id = $1", userId)
+	res, err := h.DB.Query("SELECT title, description FROM tdlist.tasks WHERE user_id = $1", userId)
 	if err != nil {
 		SendResponse(500, []byte("Erro ao buscar tarefas"), w)
 		return
@@ -23,7 +23,6 @@ func (h handler) GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 
 	for res.Next() {
 		var task models.Task
-
 		if err := res.Scan(&task.ID, &task.Title, &task.Description, &task.UserID); err != nil {
 			SendResponse(500, []byte("Error in articles"), w)
 			fmt.Println("Error scanning articles: ", err.Error())
