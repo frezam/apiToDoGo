@@ -3,14 +3,12 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/GbSouza15/apiToDoGo/internal/app/models"
-	"github.com/GbSouza15/apiToDoGo/internal/authenticator"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -54,6 +52,7 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		SendResponse(500, []byte("Erro ao gerar o token"), w)
 		return
 	}
+
 	response := map[string]string{"token": tokenString}
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
@@ -61,13 +60,10 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenValidReturn, err := authenticator.ValidatorToken(tokenString)
-	if err != nil {
-		SendResponse(500, []byte("Erro ao validar o token"), w)
-		return
-	}
-
-	fmt.Println(tokenValidReturn)
-	fmt.Println(user)
+	http.SetCookie(w, &http.Cookie{
+		Name:    "token",
+		Value:   tokenString,
+		Expires: time.Now().Add(time.Hour * 24),
+	})
 	SendResponse(200, responseJSON, w)
 }
