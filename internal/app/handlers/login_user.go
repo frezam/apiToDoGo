@@ -45,7 +45,6 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	claims := &models.Claims{UserId: user.ID.String(), RegisteredClaims: jwt.RegisteredClaims{
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 	}}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	secret := os.Getenv("SECRET")
 	tokenString, err := token.SignedString([]byte(secret))
