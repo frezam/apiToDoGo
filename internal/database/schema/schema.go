@@ -3,12 +3,11 @@ package schema
 import (
 	"database/sql"
 	"fmt"
-	"os"
+	"github.com/GbSouza15/apiToDoGo/internal/config"
 )
 
 func CreateSchemaAndTable(db *sql.DB) error {
-	var schemaName = os.Getenv("SCHEMA")
-	var createSchemaStr = fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s", schemaName)
+	var createSchemaStr = fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s", config.Env.Schema)
 
 	_, err := db.Exec(createSchemaStr)
 	if err != nil {

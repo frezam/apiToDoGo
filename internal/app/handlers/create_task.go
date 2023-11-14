@@ -3,13 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"os"
-
 	"github.com/GbSouza15/apiToDoGo/internal/app/models"
+	"github.com/GbSouza15/apiToDoGo/internal/config"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"io"
+	"net/http"
 )
 
 func (h handler) CreateTasks(w http.ResponseWriter, r *http.Request) {
@@ -39,9 +38,8 @@ func (h handler) CreateTasks(w http.ResponseWriter, r *http.Request) {
 
 	tknStr := c.Value
 	claims := &models.Claims{}
-	secret := os.Getenv("SECRET")
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(t *jwt.Token) (interface{}, error) {
-		return []byte(secret), nil
+		return []byte(config.Env.Secret), nil
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {

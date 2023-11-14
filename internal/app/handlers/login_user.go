@@ -3,9 +3,9 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"github.com/GbSouza15/apiToDoGo/internal/config"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/GbSouza15/apiToDoGo/internal/app/models"
@@ -46,8 +46,7 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 	}}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	secret := os.Getenv("SECRET")
-	tokenString, err := token.SignedString([]byte(secret))
+	tokenString, err := token.SignedString([]byte(config.Env.Secret))
 	if err != nil {
 		SendResponse(500, []byte("Erro ao gerar o token"), w)
 		return
