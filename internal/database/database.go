@@ -23,6 +23,11 @@ func InitDb() (*sql.DB, error) {
 		return nil, err
 	}
 
+	errPing := db.Ping()
+	if errPing != nil {
+		return nil, errPing
+	}
+
 	fmt.Println("Database connected!")
 	return db, nil
 }
