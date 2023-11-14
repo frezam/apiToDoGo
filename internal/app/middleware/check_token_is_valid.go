@@ -20,7 +20,6 @@ func CheckTokenIsValid(n http.HandlerFunc) http.HandlerFunc {
 		}
 
 		tokenString := c.Value
-
 		isValid, err := authenticator.ValidatorToken(tokenString)
 
 		if err != nil {
