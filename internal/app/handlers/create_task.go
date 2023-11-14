@@ -29,4 +29,6 @@ func (h handler) CreateTasks(w http.ResponseWriter, r *http.Request) {
 		SendResponse(500, []byte("Erro ao criar tarefa."), w)
 		return
 	}
+
+	SendResponse(201, []byte("Tarefa criada com sucesso."), w)
 }
