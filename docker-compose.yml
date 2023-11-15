@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+    database:
+        image: postgres:16
+        hostname: db.localhost
+        env_file: .env
+        environment:
+            POSTGRES_HOST_AUTH_METHOD: trust
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: "/ZzfmAyYuwXevSi9g500su8u+B6vx7+tZD1F33F2Yqg="
+        ports:
+            - "5432:5432"
