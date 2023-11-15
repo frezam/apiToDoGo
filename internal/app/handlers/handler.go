@@ -5,12 +5,12 @@ import (
 	"net/http"
 )
 
-type handler struct {
+type Handler struct {
 	DB *sql.DB
 }
 
-func New(db *sql.DB) handler {
-	return handler{db}
+func New(db *sql.DB) Handler {
+	return Handler{db}
 }
 
 func SendResponse(code int, data []byte, w http.ResponseWriter) {

@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/GbSouza15/apiToDoGo/internal/database/queries"
 	"io"
 	"net/http"
 
@@ -11,10 +13,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (h handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
+var (
+	ErrFailedRequest    = errors.New("erro ao ler o corpo da requisição")
+	ErrFailedDecodeJSON = errors.New("erro ao descodificar json")
+	ErrHashError        = errors.New("Error in Hash.")
+)
+
+func (h Handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		SendResponse(500, []byte("Erro ao ler o corpo da requisição"), w)
+		SendResponse(500, []byte(ErrFailedRequest.Error()), w)
 		fmt.Println(err.Error())
 		return
 	}
@@ -23,19 +31,19 @@ func (h handler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	userId := uuid.NewString()
 
 	if err := json.Unmarshal(body, &newUser); err != nil {
-		SendResponse(500, []byte("Erro ao descodificar json"), w)
+		SendResponse(500, []byte(ErrFailedDecodeJSON.Error()), w)
 		fmt.Println(err.Error())
 		return
 	}
 
 	bytes, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), 14)
 	if err != nil {
-		fmt.Println("Error in Hash.")
+		fmt.Println(ErrHashError.Error())
 	}
 
-	_, err = h.DB.Exec("INSERT INTO tdlist.users (id, name, email, password) VALUES ($1, $2, $3, $4)", userId, newUser.Name, newUser.Email, bytes)
+	err = queries.CreateUser(h.DB, userId, newUser.Name, newUser.Email, bytes)
 	if err != nil {
-		SendResponse(500, []byte("Erro ao registrar usuário."), w)
+		SendResponse(500, []byte(err.Error()), w)
 		fmt.Println(err.Error())
 		return
 	}

@@ -2,36 +2,36 @@ package main
 
 import (
 	"fmt"
+	"github.com/GbSouza15/apiToDoGo/internal/database/queries"
+	"net/http"
 	"os"
 
 	"github.com/GbSouza15/apiToDoGo/internal/app/routers"
 	"github.com/GbSouza15/apiToDoGo/internal/database"
-	"github.com/GbSouza15/apiToDoGo/internal/database/schema"
 )
 
 func main() {
 	db, err := database.InitDb()
-	if err != nil {
-		fmt.Printf("Erro ao iniciar o banco de dados, %v", err.Error())
-		os.Exit(1)
-	}
-
+	checkError(err)
 	defer db.Close()
 
-	err = schema.CreateSchemaAndTable(db)
-	if err != nil {
-		fmt.Printf("Erro no schema: %v", err)
-	}
+	err = queries.CreateSchemaAndTable(db)
+	checkError(err)
 
-	err = database.CreateTables(db)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	err = queries.CreateTables(db)
+	checkError(err)
 
-	err = routers.RoutesApi(db)
+	r := routers.RoutesApi(db)
+
+	http.Handle("/", r)
+	fmt.Println("Server is running on port 8080")
+	errListen := http.ListenAndServe(":8080", nil)
+	checkError(errListen)
+}
+
+func checkError(err error) {
 	if err != nil {
-		fmt.Printf("Erro ao iniciar o servidor: %v", err)
+		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 }

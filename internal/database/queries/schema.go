@@ -1,4 +1,4 @@
-package schema
+package queries
 
 import (
 	"database/sql"
@@ -7,12 +7,11 @@ import (
 )
 
 func CreateSchemaAndTable(db *sql.DB) error {
-	var createSchemaStr = fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s", config.Env.Schema)
-
-	_, err := db.Exec(createSchemaStr)
+	_, err := db.Exec(fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s", config.Env.Schema))
 	if err != nil {
-		return err
+		return fmt.Errorf("erro ao criar tabela User: %s", err.Error())
 	}
+
 	fmt.Println("Schema created successfully")
 	return nil
 }

@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
+	"errors"
 	"github.com/GbSouza15/apiToDoGo/internal/config"
+	"github.com/GbSouza15/apiToDoGo/internal/database/queries"
 	"io"
 	"net/http"
 	"time"
@@ -13,9 +14,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
+func (h Handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	var userLogin models.UserLogin
-	var user models.User
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -27,13 +27,13 @@ func (h handler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.DB.QueryRow("SELECT * FROM tdlist.users WHERE email = $1", userLogin.Email).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			SendResponse(404, []byte("Nenhum registro desse usuário"), w)
+	user, errGetUserByEmail := queries.GetUserByEmail(h.DB, userLogin.Email)
+	if errGetUserByEmail != nil {
+		if errors.Is(errGetUserByEmail, queries.ErrUserNoRegistry) {
+			SendResponse(404, []byte(queries.ErrUserNoRegistry.Error()), w)
 			return
 		}
-		SendResponse(401, []byte("Erro no servidor"), w)
+		SendResponse(401, []byte(queries.ErrUserServerError.Error()), w)
 		return
 	}
 
